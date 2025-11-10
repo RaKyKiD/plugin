@@ -2,12 +2,19 @@ import { findByProps, findByCodeLazy } from "@vendetta/metro";
 import { before, after } from "@vendetta/patcher";
 import { storage } from "@vendetta/plugin";
 
-// Default spoofed user data (hardcoded as per snippet; can be made configurable via storage if needed)
+// Inicializa storage si no existe (para los datos spoofed)
+if (!storage.spoofedData) {
+    storage.spoofedData = {
+        email: "you234@gmail.com",
+        phone: "+34655544544",
+        verified: true
+    };
+}
+
+// Usa storage para los datos spoofed
 const SPOOFED_USER_DATA = {
-    id: "1307155206609309780",
-    email: "you234@gmail.com",
-    phone: "+34655544544",
-    verified: true
+    id: "1307155206609309780", // Hardcoded por ahora; puedes moverlo a settings si quieres
+    ...storage.spoofedData
 };
 
 // Helper to find the dispatch module (using the provided snippet logic)
@@ -45,7 +52,7 @@ const start = () => {
                     // Fetch the base user for the spoofed ID (or fallback to current user if not found)
                     const baseUser = UserStore.getUser(SPOOFED_USER_DATA.id) || UserStore.getCurrentUser();
                     if (baseUser) {
-                        // Merge spoofed data
+                        // Merge spoofed data (usa los valores del storage)
                         event.user = Object.assign({}, baseUser, SPOOFED_USER_DATA);
                     }
                 }
@@ -87,3 +94,6 @@ const stop = () => {
 };
 
 export { start, stop };
+
+// Exporta los settings para que Vendetta los muestre
+export { default as settings } from "./Settings";
